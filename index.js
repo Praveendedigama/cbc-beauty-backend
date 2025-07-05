@@ -1,11 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import userRouter from './routes/userRouter.js';
+import dotenv from 'dotenv';
 
-
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 const mongoUrl=process.env.MONGO_DB_URI
 
 mongoose.connect(mongoUrl, {})
@@ -41,6 +43,7 @@ app.use(
     }
   
   )
+  app.use("/api/users",userRouter)
 
 
 
