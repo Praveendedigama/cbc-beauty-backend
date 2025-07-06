@@ -1,52 +1,65 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
 import userRouter from './routes/userRouter.js';
-import dotenv from 'dotenv';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import productRouter from './routes/productRouter.js';
+import orderRouter from './routes/orderRouter.js';
+import cors from "cors";
+dotenv.config()
 
-dotenv.config();
 
 const app = express();
-const PORT = 5000;
-const mongoUrl=process.env.MONGO_DB_URI
 
-mongoose.connect(mongoUrl, {})
+const mongoUrl = process.env.MONGO_DB_URI
+
+app.use(cors())
+
+mongoose.connect(mongoUrl,{})
+
 const connection = mongoose.connection;
-connection.once('open', () => {
-    console.log("MongoDB database connection successfully");
-});
 
-app.use(bodyParser.json());
+connection.once("open",()=>{
+  console.log("Database connected");
+})
+
+
+app.use(bodyParser.json())
 
 app.use(
 
-    (req,res,next)=>{
-  
-  
-  
-      const token = req.header("Authorization")?.replace("Bearer ","")
-      console.log(token)
-  
-      if(token != null){
-        jwt.verify(token,process.env.SECRET , (error,decoded)=>{
-  
-          if(!error){
-            req.user = decoded   
-            console.log(decoded)     
-          }
-  
-        })
-      }
-  
-      next()
-  
+  (req,res,next)=>{
+
+
+
+    const token = req.header("Authorization")?.replace("Bearer ","")
+    console.log(token)
+
+    if(token != null){
+      jwt.verify(token,process.env.SECRET , (error,decoded)=>{
+
+        if(!error){
+          req.user = decoded   
+          console.log(decoded)     
+        }
+
+      })
     }
-  
-  )
-  app.use("/api/users",userRouter)
+
+    next()
+
+  }
+
+)
+app.use("/api/users",userRouter)
+app.use("/api/products",productRouter)
+app.use("/api/orders",orderRouter)
 
 
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.listen(
+  5000,
+  ()=>{
+    console.log('Server is running on port 5000');
+  }
+)

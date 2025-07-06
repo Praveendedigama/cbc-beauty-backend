@@ -1,43 +1,45 @@
-import User from "../Models/user.js";
+import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import axios from "axios";
+dotenv.config()
+export function createUser(req,res){
 
-export function createUser(req, res) {
-  const newUserData = req.body;
+  const newUserData = req.body
 
-  if (newUserData.type === "admin") {
-    if (!req.user) {
+  if(newUserData.type == "admin"){
+
+    if(req.user==null){
       res.json({
-        message: "Please login as administrator to create admin accounts",
-      });
-      return;
+        message: "Please login as administrator to create admin accounts"
+      })
+      return
     }
 
-    if (req.user.type !== "admin") {
+    if(req.user.type != "admin"){
       res.json({
-        message: "Please login as administrator to create admin accounts",
-      });
-      return;
+        message: "Please login as administrator to create admin accounts"
+      })
+      return
     }
+
   }
 
-  newUserData.password = bcrypt.hashSync(newUserData.password, 10);
+  newUserData.password = bcrypt.hashSync(newUserData.password, 10)  
 
-  const user = new User(newUserData);
+  const user = new User(newUserData)
 
-  user
-    .save()
-    .then(() => {
-      res.json({
-        message: "User created successfully",
-      });
+  user.save().then(()=>{
+    res.json({
+      message: "User created"
     })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Error creating user",
-        error: error.message,
-      });
-    });
+  }).catch((error)=>{
+    res.json({      
+      message: "User not created"
+    })
+  })
+  
 }
 
 export function loginUser(req,res){
@@ -89,16 +91,96 @@ export function loginUser(req,res){
   )
 }
 
+export function isAdmin(req){
+  if(req.user==null){
+    return false
+  }
 
-//admin@gmail.com.com  
-// PW: 123
-//Admin token: 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbS5jb20iLCJmaXJzdE5hbWUiOiJhZG1pbiIsImxhc3ROYW1lIjoiYWRtaW4iLCJpc0Jsb2NrZWQiOmZhbHNlLCJ0eXBlIjoiYWRtaW4iLCJwcm9maWxlUGljdHVyZSI6Imh0dHBzOi8vaW1nLmZyZWVwaWsuY29tL2ZyZWUtdmVjdG9yL3VzZXItYmx1ZS1ncmFkaWVudF83ODM3MC00NjkyLmpwZz90PXN0PTE3MzE3NzA4NDB-ZXhwPTE3MzE3NzQ0NDB-aG1hYz0wZjhhYzA3NGMyMzIxMjg5ZjYzODU4NzI4ZTA3M2MwZDU5NDZlYTZjYjU0MmMzYjI1OWE4OGUzNjdhN2RkZTI1Jnc9NzQwIiwiaWF0IjoxNzUxNzA3Mzk0fQ.cMFwITZipLHtlvFf_gBeY6MGFCENKH0Kyt2t4H8FEPQ
+  if(req.user.type != "admin"){
+    return false
+  }
+
+  return true
+}
+
+export function isCustomer(req){
+  if(req.user==null){
+    return false
+  }
+
+  if(req.user.type != "customer"){
+    return false
+  }
+
+  return true
+}
+
+export async function googleLogin(req,res){
+  console.log(req.body)
+  const token = req.body.token
+  //'https://www.googleapis.com/oauth2/v3/userinfo'
+  try{
+    const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo',{
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    const email = response.data.email
+    //check if user exists
+    const usersList = await User.find({email: email})
+    if(usersList.length >0){
+      const user = usersList[0]
+      const token = jwt.sign({
+        email : user.email,
+        firstName : user.firstName,
+        lastName : user.lastName,
+        isBlocked : user.isBlocked,
+        type : user.type,
+        profilePicture : user.profilePicture
+      } , process.env.SECRET)
+      
+      res.json({
+        message: "User logged in",
+        token: token,
+        user : {
+          firstName : user.firstName,
+          lastName : user.lastName,
+          type : user.type,
+          profilePicture : user.profilePicture,
+          email : user.email
+        }
+      })
+    }else{
+      //create new user
+      const newUserData = {
+        email: email,
+        firstName: response.data.given_name,
+        lastName: response.data.family_name,
+        type: "customer",
+        password: "ffffff",
+        profilePicture: response.data.picture
+      }
+      const user = new User(newUserData)
+      user.save().then(()=>{
+        res.json({
+          message: "User created"
+        })
+      }).catch((error)=>{
+        res.json({      
+          message: "User not created"
+        })
+      })
+
+    }
+
+  }catch(e){
+    res.json({
+      message: "Google login failed"
+    })
+  }
 
 
-// cus acc
-// {
-//   "email": "praveen@gmail.com",
-//   "password": "securePassword123"
-//   token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InByYXZlZW5AZ21haWwuY29tIiwiZmlyc3ROYW1lIjoicHJhdmVlbiIsImxhc3ROYW1lIjoiaGFuc2EiLCJpc0Jsb2NrZWQiOmZhbHNlLCJ0eXBlIjoiY3VzdG9tZXIiLCJwcm9maWxlUGljdHVyZSI6Imh0dHBzOi8vaW1nLmZyZWVwaWsuY29tL2ZyZWUtdmVjdG9yL3VzZXItYmx1ZS1ncmFkaWVudF83ODM3MC00NjkyLmpwZz90PXN0PTE3MzE3NzA4NDB-ZXhwPTE3MzE3NzQ0NDB-aG1hYz0wZjhhYzA3NGMyMzIxMjg5ZjYzODU4NzI4ZTA3M2MwZDU5NDZlYTZjYjU0MmMzYjI1OWE4OGUzNjdhN2RkZTI1Jnc9NzQwIiwiaWF0IjoxNzUxNzA3NTI3fQ.qizjqvhNneb76hKmANEaF0JwPTiZsuMhXARfVTBBXFE
-// }
+}
+
+// malith27@example.com securepassword123 - admin
+// malith28@example.com securepassword123 -customer
