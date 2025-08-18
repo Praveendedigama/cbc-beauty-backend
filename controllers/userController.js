@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
 dotenv.config()
+
 export function createUser(req,res){
 
   const newUserData = req.body
