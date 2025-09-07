@@ -16,7 +16,14 @@ const userSchema = mongoose.Schema({
   },
   password : {
     type : String,
-    required : true
+    required : function() {
+      return !this.googleId; // Password not required if Google OAuth user
+    }
+  },
+  googleId : {
+    type : String,
+    unique : true,
+    sparse : true // Allows multiple null values
   },
   isBlocked : {
     type : Boolean,

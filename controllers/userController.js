@@ -173,7 +173,7 @@ export function loginUser(req, res) {
           type: user.type,
           profilePicture: user.profilePicture
         }, process.env.SECRET, { expiresIn: '24h' })
-        
+
         console.log('JWT token created successfully');
 
         res.json({
