@@ -3,7 +3,13 @@ import Product from "../models/product.js";
 import { isAdmin, isCustomer } from "./userController.js";
 
 export async function createOrder(req, res) {
+  console.log('=== ORDER CREATION DEBUG ===');
+  console.log('User object:', req.user);
+  console.log('User type:', req.user?.type);
+  console.log('isCustomer result:', isCustomer(req.user));
+  
   if (!isCustomer(req.user)) {
+    console.log('❌ User is not a customer. User type:', req.user?.type);
     return res.status(403).json({
       message: "Please login as customer to create orders",
     });

@@ -64,9 +64,27 @@ export function createUser(req, res) {
 
     const user = new User(newUserData)
 
-    user.save().then(() => {
+    user.save().then((savedUser) => {
+      // Auto-login after registration
+      const token = jwt.sign({
+        email: savedUser.email,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        isBlocked: savedUser.isBlocked,
+        type: savedUser.type,
+        profilePicture: savedUser.profilePicture
+      }, process.env.SECRET, { expiresIn: '24h' })
+
       res.status(201).json({
-        message: "User created successfully"
+        message: "User created successfully",
+        token: token,
+        user: {
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          type: savedUser.type,
+          profilePicture: savedUser.profilePicture,
+          email: savedUser.email
+        }
       })
     }).catch((error) => {
       console.error("Error creating user:", error);
