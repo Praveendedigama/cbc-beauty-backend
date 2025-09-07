@@ -140,6 +140,11 @@ export function loginUser(req, res) {
         });
       }
 
+      console.log('=== LOGIN DEBUG ===');
+      console.log('User found:', user.email);
+      console.log('User type:', user.type);
+      console.log('User isBlocked:', user.isBlocked);
+
       // Check if user is blocked
       if (user.isBlocked) {
         return res.status(403).json({
@@ -150,6 +155,15 @@ export function loginUser(req, res) {
       const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
       if (isPasswordCorrect) {
+        console.log('Password correct, creating JWT token...');
+        console.log('Token payload:', {
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isBlocked: user.isBlocked,
+          type: user.type,
+          profilePicture: user.profilePicture
+        });
 
         const token = jwt.sign({
           email: user.email,
@@ -159,6 +173,8 @@ export function loginUser(req, res) {
           type: user.type,
           profilePicture: user.profilePicture
         }, process.env.SECRET, { expiresIn: '24h' })
+        
+        console.log('JWT token created successfully');
 
         res.json({
           message: "User logged in successfully",
