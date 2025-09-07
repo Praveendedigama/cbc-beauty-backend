@@ -40,9 +40,11 @@ app.use("/api/users", userRouter)
 app.use("/api/products", productRouter)
 app.use("/api/orders", orderRouter)
 
+const PORT = process.env.PORT || 5000;
+
 app.listen(
-  5000,
+  PORT,
   () => {
-    console.log('Server is running on port 5000');
+    console.log(`Server is running on port ${PORT}`);
   }
 )
