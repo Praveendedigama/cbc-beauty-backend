@@ -8,13 +8,13 @@ dotenv.config();
 const authRouter = express.Router();
 
 // Google OAuth Routes
-authRouter.get('/google', 
-    passport.authenticate('google', { 
-        scope: ['profile', 'email'] 
+authRouter.get('/google',
+    passport.authenticate('google', {
+        scope: ['profile', 'email']
     })
 );
 
-authRouter.get('/google/callback', 
+authRouter.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
         try {

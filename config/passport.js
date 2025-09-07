@@ -13,10 +13,10 @@ passport.use(new GoogleStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         console.log('Google OAuth Profile:', profile);
-        
+
         // Check if user already exists
         let existingUser = await User.findOne({ email: profile.emails[0].value });
-        
+
         if (existingUser) {
             // User exists, update Google ID if not set
             if (!existingUser.googleId) {
@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
             }
             return done(null, existingUser);
         }
-        
+
         // Create new user
         const newUser = new User({
             googleId: profile.id,
@@ -37,11 +37,11 @@ passport.use(new GoogleStrategy({
             isBlocked: false,
             password: 'google-oauth-user' // Placeholder password
         });
-        
+
         await newUser.save();
         console.log('New Google user created:', newUser.email);
         return done(null, newUser);
-        
+
     } catch (error) {
         console.error('Google OAuth error:', error);
         return done(error, null);

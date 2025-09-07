@@ -1,14 +1,6 @@
 import Product from "../models/product.js";
-import { isAdmin } from "./userController.js";
 
 export function createProduct(req, res) {
-  if (!isAdmin(req)) {
-    res.json({
-      message: "Please login as administrator to add products",
-    });
-    return;
-  }
-
   const newProductData = req.body;
 
   const product = new Product(newProductData);
@@ -21,8 +13,9 @@ export function createProduct(req, res) {
       });
     })
     .catch((error) => {
-      res.status(403).json({
-        message: error,
+      console.error('Product creation error:', error);
+      res.status(500).json({
+        message: error.message || 'Failed to create product',
       });
     });
 }
@@ -34,13 +27,6 @@ export function getProducts(req, res) {
 }
 
 export function deleteProduct(req, res) {
-  if (!isAdmin(req)) {
-    res.status(403).json({
-      message: "Please login as administrator to delete products",
-    });
-    return;
-  }
-
   const productId = req.params.productId;
 
   Product.deleteOne({ productId: productId })
@@ -50,20 +36,14 @@ export function deleteProduct(req, res) {
       });
     })
     .catch((error) => {
-      res.status(403).json({
-        message: error,
+      console.error('Product deletion error:', error);
+      res.status(500).json({
+        message: error.message || 'Failed to delete product',
       });
     });
 }
 
 export function updateProduct(req, res) {
-  if (!isAdmin(req)) {
-    res.status(403).json({
-      message: "Please login as administrator to update products",
-    });
-    return;
-  }
-
   const productId = req.params.productId;
   const newProductData = req.body;
 
