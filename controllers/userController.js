@@ -67,7 +67,7 @@ export function createUser(req, res) {
     user.save().then((savedUser) => {
       console.log('User saved successfully:', savedUser);
       console.log('SECRET available:', !!process.env.SECRET);
-      
+
       try {
         // Auto-login after registration
         const token = jwt.sign({
@@ -78,7 +78,7 @@ export function createUser(req, res) {
           type: savedUser.type,
           profilePicture: savedUser.profilePicture
         }, process.env.SECRET, { expiresIn: '24h' })
-        
+
         console.log('Token generated successfully');
 
         res.status(201).json({
