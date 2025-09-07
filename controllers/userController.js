@@ -65,27 +65,39 @@ export function createUser(req, res) {
     const user = new User(newUserData)
 
     user.save().then((savedUser) => {
-      // Auto-login after registration
-      const token = jwt.sign({
-        email: savedUser.email,
-        firstName: savedUser.firstName,
-        lastName: savedUser.lastName,
-        isBlocked: savedUser.isBlocked,
-        type: savedUser.type,
-        profilePicture: savedUser.profilePicture
-      }, process.env.SECRET, { expiresIn: '24h' })
-
-      res.status(201).json({
-        message: "User created successfully",
-        token: token,
-        user: {
+      console.log('User saved successfully:', savedUser);
+      console.log('SECRET available:', !!process.env.SECRET);
+      
+      try {
+        // Auto-login after registration
+        const token = jwt.sign({
+          email: savedUser.email,
           firstName: savedUser.firstName,
           lastName: savedUser.lastName,
+          isBlocked: savedUser.isBlocked,
           type: savedUser.type,
-          profilePicture: savedUser.profilePicture,
-          email: savedUser.email
-        }
-      })
+          profilePicture: savedUser.profilePicture
+        }, process.env.SECRET, { expiresIn: '24h' })
+        
+        console.log('Token generated successfully');
+
+        res.status(201).json({
+          message: "User created successfully",
+          token: token,
+          user: {
+            firstName: savedUser.firstName,
+            lastName: savedUser.lastName,
+            type: savedUser.type,
+            profilePicture: savedUser.profilePicture,
+            email: savedUser.email
+          }
+        })
+      } catch (jwtError) {
+        console.error('JWT generation error:', jwtError);
+        res.status(500).json({
+          message: "User created but login failed"
+        })
+      }
     }).catch((error) => {
       console.error("Error creating user:", error);
       res.status(500).json({

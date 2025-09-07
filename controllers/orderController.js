@@ -7,7 +7,7 @@ export async function createOrder(req, res) {
   console.log('User object:', req.user);
   console.log('User type:', req.user?.type);
   console.log('isCustomer result:', isCustomer(req.user));
-  
+
   if (!isCustomer(req.user)) {
     console.log('❌ User is not a customer. User type:', req.user?.type);
     return res.status(403).json({
