@@ -23,8 +23,8 @@ app.use(cors({
     'http://localhost:3000',
     'https://cbc-beauty.vercel.app',
     'https://crystal-beauty.vercel.app',
-    'https://cbc-beauty-frontend.vercel.app',
-    'https://cbc-beauty-frontend.vercel.app'
+    'https://cbc-beauty-frontend-2n39e380g.vercel.app',
+    'https://cbc-beauty-frontend-2n39e380g.vercel.app'
   ],
   credentials: true
 }))
