@@ -29,7 +29,7 @@ authRouter.get('/google/callback',
             }, process.env.SECRET, { expiresIn: '24h' });
 
             // Redirect to frontend with token
-            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+            const frontendUrl = process.env.FRONTEND_URL || 'https://cbc-beauty-frontend.vercel.app';
             res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify({
                 firstName: req.user.firstName,
                 lastName: req.user.lastName,
@@ -39,9 +39,10 @@ authRouter.get('/google/callback',
             }))}`);
         } catch (error) {
             console.error('Google OAuth callback error:', error);
-            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_failed`);
+            res.redirect(`${process.env.FRONTEND_URL || 'https://cbc-beauty-frontend.vercel.app'}/login?error=oauth_failed`);
         }
     }
 );
 
 export default authRouter;
+

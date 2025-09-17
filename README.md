@@ -62,7 +62,7 @@ A robust Node.js backend API for CBC Beauty e-commerce platform with MongoDB, JW
 
 5. **Test the API**
    ```bash
-   curl http://localhost:5000/api/products
+   curl https://cbc-beauty-backend.onrender.com/api/products
    ```
 
 ## 🛠️ Available Scripts
@@ -215,10 +215,10 @@ The API is configured to accept requests from:
 
 ```bash
 # Test API endpoints
-curl http://localhost:5000/api/products
+curl https://cbc-beauty-backend.onrender.com/api/products
 
 # Test authentication
-curl -X POST http://localhost:5000/api/users/register \
+curl -X POST https://cbc-beauty-backend.onrender.com/api/users/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
 ```
