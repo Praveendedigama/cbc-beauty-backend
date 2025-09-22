@@ -140,10 +140,6 @@ export function loginUser(req, res) {
         });
       }
 
-      console.log('=== LOGIN DEBUG ===');
-      console.log('User found:', user.email);
-      console.log('User type:', user.type);
-      console.log('User isBlocked:', user.isBlocked);
 
       // Check if user is blocked
       if (user.isBlocked) {
@@ -155,17 +151,7 @@ export function loginUser(req, res) {
       const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
       if (isPasswordCorrect) {
-        console.log('Password correct, creating JWT token...');
-        console.log('Token payload:', {
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          isBlocked: user.isBlocked,
-          type: user.type,
-          profilePicture: user.profilePicture
-        });
-
-        const token = jwt.sign({
+       const token = jwt.sign({
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -294,4 +280,4 @@ export async function googleLogin(req, res) {
 }
 
 // hansa@gmail.com praveen123 - admin
-// john.doe@example.com  customer -customer
+// mailtopraveenhansa@gmail.com  password123 -customer

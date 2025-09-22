@@ -8,17 +8,10 @@ export const authenticateToken = (req, res, next) => {
     const authHeader = req.header("Authorization");
     const token = authHeader?.replace("Bearer ", "");
 
-    console.log("=== AUTHENTICATION DEBUG ===");
-    console.log("Authorization header:", authHeader);
-    console.log("Token:", token ? "Present" : "Missing");
-    console.log("SECRET available:", !!process.env.SECRET);
-
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.SECRET);
             req.user = decoded;
-            console.log("User authenticated:", decoded.email);
-            console.log("User type:", decoded.type);
         } catch (error) {
             console.log("Invalid token:", error.message);
             req.user = null;
